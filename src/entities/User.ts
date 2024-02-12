@@ -25,6 +25,15 @@ export class User {
 
     @Column({ type: 'date', default: null })
     dob: Date;
+
+    @Column({ default: true, nullable: false, type: 'boolean' })
+    isActive: boolean;
+
+    @Column({ nullable: true })
+    otp: number;
+
+    @Column({ nullable: true })
+    otpTimestamp: Date;
     
     @Column({ type: 'date', default: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}` }) 
     createdAt: Date;

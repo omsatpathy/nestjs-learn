@@ -7,4 +7,6 @@ export declare class AuthService {
     private jwtService;
     constructor(userRepository: Repository<User>, jwtService: JwtService);
     authUser(authUserDetails: authParams): Promise<string>;
+    forgotPassword(email: string): Promise<number>;
+    resetPassword(email: string, otp: number, newPassword: string): Promise<void>;
 }

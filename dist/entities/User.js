@@ -49,6 +49,18 @@ __decorate([
     __metadata("design:type", Date)
 ], User.prototype, "dob", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ default: true, nullable: false, type: 'boolean' }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isActive", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Number)
+], User.prototype, "otp", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Date)
+], User.prototype, "otpTimestamp", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: 'date', default: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}` }),
     __metadata("design:type", Date)
 ], User.prototype, "createdAt", void 0);

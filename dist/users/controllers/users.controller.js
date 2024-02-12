@@ -17,34 +17,37 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("../services/users.service");
 const createUser_dto_1 = require("../dtos/createUser.dto");
 const auth_guard_1 = require("../../auth/guards/auth.guard");
+const sendResponse_1 = require("../../utils/sendResponse");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
     }
     ;
-    async createUser(createUserDto) {
-        const createdUser = await this.usersService.createUser(createUserDto);
-        return createdUser;
+    async createUser(createUserDto, response) {
+        const createdUser = await this.usersService.createUser(createUserDto, response);
+        (0, sendResponse_1.sendResponse)(response, { message: 'User created.', createdUser }, 200);
     }
-    async deleteUser(request) {
-        const deletedUser = await this.usersService.deleteUser(request);
-        return deletedUser;
+    async deleteUser(request, response) {
+        const deletedUser = await this.usersService.deleteUser(request, response);
+        (0, sendResponse_1.sendResponse)(response, { message: 'User deleted.', data: deletedUser }, 200);
     }
 };
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [createUser_dto_1.CreateUserDto]),
+    __metadata("design:paramtypes", [createUser_dto_1.CreateUserDto, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "createUser", null);
 __decorate([
     (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
     (0, common_1.Delete)(),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "deleteUser", null);
 exports.UsersController = UsersController = __decorate([

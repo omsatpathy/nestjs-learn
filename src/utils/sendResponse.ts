@@ -1,4 +1,4 @@
-export const sendResponse = (data, statusCode) => {
+export const sendResponse = (res, data, statusCode) => {
 
     const response  = {
         statusCode,

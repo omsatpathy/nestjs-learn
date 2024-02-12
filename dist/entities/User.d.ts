@@ -6,5 +6,8 @@ export declare class User {
     first_name: string;
     last_name: string;
     dob: Date;
+    isActive: boolean;
+    otp: number;
+    otpTimestamp: Date;
     createdAt: Date;
 }

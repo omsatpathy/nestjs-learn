@@ -22,19 +22,22 @@ let UsersService = class UsersService {
         this.userRepository = userRepository;
     }
     ;
-    async createUser(userDetails) {
+    async createUser(userDetails, response) {
         const newUser = this.userRepository.create({ ...userDetails });
         const savedUser = await this.userRepository.save(newUser);
         const { id, password, ...createdUserDetails } = savedUser;
         return createdUserDetails;
     }
-    async deleteUser(request) {
+    async deleteUser(request, response) {
         const { email } = request.user;
-        const deletedUser = await this.userRepository.delete({ email });
-        if (deletedUser.affected === 0) {
-            return "User does not exist.";
+        const deletedUser = await this.userRepository.findOne({ where: { email } });
+        if (!deletedUser || !deletedUser.isActive) {
+            throw new common_1.NotFoundException('User does not exist or already deactivated.');
         }
-        return deletedUser;
+        deletedUser.isActive = false;
+        await this.userRepository.save(deletedUser);
+        const { password, id, otp, otpTimestamp, ...deletedUserDetails } = deletedUser;
+        return deletedUserDetails;
     }
 };
 exports.UsersService = UsersService;

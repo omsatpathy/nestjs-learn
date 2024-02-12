@@ -1,6 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Request, Response } from "express";
 import { User } from "src/entities/User";
+import { sendResponse } from "src/utils/sendResponse";
 import { CreateUserParams } from "src/utils/types";
 import { Repository } from "typeorm";
 
@@ -11,7 +13,7 @@ export class UsersService {
         @InjectRepository(User) private userRepository: Repository<User>
     ) {};
 
-    async createUser(userDetails: CreateUserParams) {
+    async createUser(userDetails: CreateUserParams, response: Response) {
         const newUser = this.userRepository.create({ ...userDetails });
         const savedUser = await this.userRepository.save(newUser);
 
@@ -19,12 +21,17 @@ export class UsersService {
         return createdUserDetails;
     }
 
-    async deleteUser(request) {
+    async deleteUser(request: any, response: Response) {
         const { email } = request.user
-        const deletedUser = await this.userRepository.delete({ email });
-        if(deletedUser.affected === 0) {
-            return "User does not exist."
+        const deletedUser = await this.userRepository.findOne({ where: { email } });
+
+        if(!deletedUser || !deletedUser.isActive) {
+            throw new NotFoundException('User does not exist or already deactivated.')
         }
-        return deletedUser;
+
+        deletedUser.isActive = false;
+        await this.userRepository.save(deletedUser);
+        const { password, id, otp, otpTimestamp, ...deletedUserDetails } = deletedUser;
+        return deletedUserDetails;
     }
 }
