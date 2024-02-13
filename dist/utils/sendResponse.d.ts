@@ -1,1 +1,6 @@
-export declare const sendResponse: (res: any, data: any, statusCode: any) => void;
+export declare class CustomApiResponse {
+    statusCode: number;
+    data: any;
+    constructor(statusCode: number, data: any);
+    sendResponse(res: any): void;
+}

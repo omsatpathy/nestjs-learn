@@ -1,18 +1,20 @@
-import { IsDate, IsEmail, IsNotEmpty, Length, } from 'class-validator'
+import { IsDate, IsEmail, IsISO8601, IsNotEmpty, Length, MaxLength, MinLength, } from 'class-validator'
 
 export class CreateUserDto {
     @IsEmail()
     email: string;
 
-    @Length(5, null, { message: 'Password must be atleast 5 characters.' })
-    password: string;
-
     @Length(2, 50, { message: 'First name must be between 2 and 50 characters.' })
-    first_name: string;
+    name: string;
 
-    @Length(2, 100, { message: 'Last name must be between 2 and 100 characters.' })
-    last_name: string;
+    phone_no: number;
 
-    @IsDate()
-    dob: Date;
+    @Length(2, 100, { message: 'Occupation must be  between 2 and 100 characters.' })
+    occupation: string;
+
+    @Length(10, 100, { message: 'Address must be  between 10 and 100 characters.' })
+    address: string;
+
+    @Length(5, 100, { message: 'Password must be atleast 5 characters.' })
+    password: string;
 }

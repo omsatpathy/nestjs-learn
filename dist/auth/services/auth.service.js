@@ -19,60 +19,87 @@ const User_1 = require("../../entities/User");
 const typeorm_2 = require("typeorm");
 const md5 = require("md5");
 const jwt_1 = require("@nestjs/jwt");
+const UserPassword_1 = require("../../entities/UserPassword");
+const Otp_1 = require("../../entities/Otp");
 let AuthService = class AuthService {
-    constructor(userRepository, jwtService) {
+    constructor(userRepository, userPasswordRepository, otpRepository, jwtService) {
         this.userRepository = userRepository;
+        this.userPasswordRepository = userPasswordRepository;
+        this.otpRepository = otpRepository;
         this.jwtService = jwtService;
     }
     ;
     async authUser(authUserDetails) {
-        const { email, password } = authUserDetails;
-        const user = await this.userRepository.findOne({ where: { email } });
-        const hashedUserPassword = md5(password);
-        if (!user || hashedUserPassword !== user.password) {
-            throw new common_1.UnauthorizedException();
+        try {
+            const { email, password } = authUserDetails;
+            const user = await this.userPasswordRepository.findOne({ where: { email } });
+            const hashedUserPassword = md5(password);
+            if (!user || hashedUserPassword !== user.password) {
+                throw new common_1.UnauthorizedException();
+            }
+            if (!user.isActive) {
+                user.isActive = true;
+                await this.userRepository.save(user);
+            }
+            const payload = { email: user.email };
+            const token = this.jwtService.sign(payload);
+            return token;
         }
-        if (!user.isActive) {
-            user.isActive = true;
-            await this.userRepository.save(user);
+        catch (error) {
+            throw new Error(error);
         }
-        const payload = { email: user.email };
-        const token = this.jwtService.sign(payload);
-        return token;
     }
     async forgotPassword(email) {
-        const otp = Math.floor(100000 + Math.random() * 900000);
-        const user = await this.userRepository.findOne({ where: { email } });
-        if (!user) {
-            throw new common_1.NotFoundException('User does not exist.');
+        try {
+            const userInUserRepository = await this.userRepository.findOne({ where: { email } });
+            console.log(userInUserRepository);
+            const userInUserPasswordRepository = await this.userPasswordRepository.findOne({ where: { user_id: userInUserRepository } });
+            console.log(userInUserPasswordRepository);
+            if (!userInUserRepository || !userInUserPasswordRepository.isActive) {
+                throw new common_1.NotFoundException('userInUserPasswordRepository does not exist.');
+            }
+            const otp = Math.floor(100000 + Math.random() * 900000);
+            const otpTimestamp = new Date();
+            const newUserInOtpRepository = this.otpRepository.create({ email, otp, otpTimestamp });
+            const savedUserInOtpRepository = await this.otpRepository.save(newUserInOtpRepository);
+            return savedUserInOtpRepository;
         }
-        user.otp = otp;
-        user.otpTimestamp = new Date();
-        await this.userRepository.save(user);
-        return otp;
+        catch (error) {
+            throw new Error(error);
+        }
     }
     async resetPassword(email, otp, newPassword) {
-        const user = await this.userRepository.findOne({ where: { email } });
-        if (!user || user.otp !== otp) {
-            throw new common_1.BadRequestException('Invalid OTP or User not found.');
+        try {
+            const userInUserRepository = await this.userRepository.findOne({ where: { email } });
+            const userInUserPasswordRepository = await this.userPasswordRepository.findOne({ where: { user_id: userInUserRepository } });
+            const userInOtpRepository = await this.otpRepository.findOne({ where: { email: userInUserRepository.email } });
+            if (!userInUserRepository && userInOtpRepository.otp !== otp && !userInUserPasswordRepository.isActive) {
+                throw new common_1.BadRequestException('Invalid OTP or User not found.');
+            }
+            const currentTimestamp = new Date();
+            const otpTimestamp = userInOtpRepository.otpTimestamp;
+            const timeDiff = (currentTimestamp.getTime() - otpTimestamp.getTime()) / (1000 * 60);
+            if (timeDiff > 2) {
+                throw new common_1.BadRequestException('OTP expired');
+            }
+            userInUserPasswordRepository.password = md5(newPassword);
+            await this.otpRepository.save(userInOtpRepository);
+            await this.userPasswordRepository.save(userInUserPasswordRepository);
         }
-        const currentTimestamp = new Date();
-        const otpTimestamp = user.otpTimestamp;
-        const timeDiff = (currentTimestamp.getTime() - otpTimestamp.getTime()) / (1000 * 60);
-        if (timeDiff > 2) {
-            throw new common_1.BadRequestException('OTP expired');
+        catch (error) {
+            throw new Error(error);
         }
-        user.password = md5(newPassword);
-        user.otp = null;
-        user.otpTimestamp = null;
-        await this.userRepository.save(user);
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(User_1.User)),
+    __param(1, (0, typeorm_1.InjectRepository)(UserPassword_1.UserPassword)),
+    __param(2, (0, typeorm_1.InjectRepository)(Otp_1.Otp)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

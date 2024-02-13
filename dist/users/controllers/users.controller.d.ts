@@ -4,6 +4,6 @@ import { Response } from 'express';
 export declare class UsersController {
     private usersService;
     constructor(usersService: UsersService);
-    createUser(createUserDto: CreateUserDto, response: Response): Promise<void>;
-    deleteUser(request: any, response: Response): Promise<void>;
+    createUser(createUserDto: CreateUserDto, res: Response): Promise<void>;
+    deleteUser(request: any, res: Response): Promise<void>;
 }

@@ -19,19 +19,19 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "email", void 0);
 __decorate([
-    (0, class_validator_1.Length)(5, null, { message: 'Password must be atleast 5 characters.' }),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "password", void 0);
-__decorate([
     (0, class_validator_1.Length)(2, 50, { message: 'First name must be between 2 and 50 characters.' }),
     __metadata("design:type", String)
-], CreateUserDto.prototype, "first_name", void 0);
+], CreateUserDto.prototype, "name", void 0);
 __decorate([
-    (0, class_validator_1.Length)(2, 100, { message: 'Last name must be between 2 and 100 characters.' }),
+    (0, class_validator_1.Length)(2, 100, { message: 'Occupation must be  between 2 and 100 characters.' }),
     __metadata("design:type", String)
-], CreateUserDto.prototype, "last_name", void 0);
+], CreateUserDto.prototype, "occupation", void 0);
 __decorate([
-    (0, class_validator_1.IsDate)(),
-    __metadata("design:type", Date)
-], CreateUserDto.prototype, "dob", void 0);
+    (0, class_validator_1.Length)(10, 100, { message: 'Address must be  between 10 and 100 characters.' }),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "address", void 0);
+__decorate([
+    (0, class_validator_1.Length)(5, 100, { message: 'Password must be atleast 5 characters.' }),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "password", void 0);
 //# sourceMappingURL=createUser.dto.js.map

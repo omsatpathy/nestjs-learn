@@ -6,6 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { User } from './entities/User';
 import { AuthModule } from './auth/auth.module';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from './utils/errorHandler';
+import { UserPassword } from './entities/UserPassword';
+import { Otp } from './entities/Otp';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -17,10 +21,10 @@ import { AuthModule } from './auth/auth.module';
     username: process.env.MYSQL_USERNAME,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-    entities: [User],
+    entities: [User, UserPassword, Otp],
     synchronize: true
   }), UsersModule, AuthModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, {provide:APP_FILTER, useClass: GlobalExceptionFilter}],
 })
 export class AppModule {}

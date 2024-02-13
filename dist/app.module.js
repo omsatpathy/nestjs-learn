@@ -15,6 +15,10 @@ const typeorm_1 = require("@nestjs/typeorm");
 const users_module_1 = require("./users/users.module");
 const User_1 = require("./entities/User");
 const auth_module_1 = require("./auth/auth.module");
+const core_1 = require("@nestjs/core");
+const errorHandler_1 = require("./utils/errorHandler");
+const UserPassword_1 = require("./entities/UserPassword");
+const Otp_1 = require("./entities/Otp");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -29,11 +33,11 @@ exports.AppModule = AppModule = __decorate([
                 username: process.env.MYSQL_USERNAME,
                 password: process.env.MYSQL_PASSWORD,
                 database: process.env.MYSQL_DATABASE,
-                entities: [User_1.User],
+                entities: [User_1.User, UserPassword_1.UserPassword, Otp_1.Otp],
                 synchronize: true
             }), users_module_1.UsersModule, auth_module_1.AuthModule],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [app_service_1.AppService, { provide: core_1.APP_FILTER, useClass: errorHandler_1.GlobalExceptionFilter }],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

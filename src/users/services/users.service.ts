@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Request, Response } from "express";
 import { User } from "src/entities/User";
-import { sendResponse } from "src/utils/sendResponse";
+import { UserPassword } from "src/entities/UserPassword";
 import { CreateUserParams } from "src/utils/types";
 import { Repository } from "typeorm";
 
@@ -10,28 +10,51 @@ import { Repository } from "typeorm";
 export class UsersService {
 
     constructor(
-        @InjectRepository(User) private userRepository: Repository<User>
+        @InjectRepository(User) private userRepository: Repository<User>,
+        @InjectRepository(UserPassword) private userPasswordRepository: Repository<UserPassword>
     ) {};
 
-    async createUser(userDetails: CreateUserParams, response: Response) {
-        const newUser = this.userRepository.create({ ...userDetails });
-        const savedUser = await this.userRepository.save(newUser);
+    async createUser(userDetails: CreateUserParams) {
 
-        const { id, password, ...createdUserDetails } = savedUser;
-        return createdUserDetails;
-    }
+        try {
+            const { password, ...userToBeCreated } = userDetails;
 
-    async deleteUser(request: any, response: Response) {
-        const { email } = request.user
-        const deletedUser = await this.userRepository.findOne({ where: { email } });
+            const newUserInUserRepo = this.userRepository.create({ ...userToBeCreated });
+            const savedUserInUserRepo = await this.userRepository.save(newUserInUserRepo); 
+            const { email } = savedUserInUserRepo;
 
-        if(!deletedUser || !deletedUser.isActive) {
-            throw new NotFoundException('User does not exist or already deactivated.')
+            const newUserInUserPasswordRepo = this.userPasswordRepository.create({ user_id: savedUserInUserRepo, email, password })
+            const savedUserInUserPasswordRepo = await this.userPasswordRepository.save(newUserInUserPasswordRepo);
+
+            return savedUserInUserRepo;
+
+        } catch (error) {
+            
+            throw new Error(error);
+
         }
 
-        deletedUser.isActive = false;
-        await this.userRepository.save(deletedUser);
-        const { password, id, otp, otpTimestamp, ...deletedUserDetails } = deletedUser;
-        return deletedUserDetails;
+    }
+
+    async deleteUser(request: any) {
+        try {
+
+            const { email } = request.user
+            const deletedUser = await this.userPasswordRepository.findOne({ where: { email } });
+    
+            if(!deletedUser || !deletedUser.isActive) {
+                throw new NotFoundException('User does not exist or already deactivated.')
+            }
+            deletedUser.isActive = false;
+            await this.userPasswordRepository.save(deletedUser);
+
+            const deletedUserDetails = await this.userRepository.findOne({ where: { email } });
+
+            return deletedUserDetails;
+
+        } catch (error) {
+            throw new Error(error);
+        }
+
     }
 }

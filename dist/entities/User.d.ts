@@ -1,13 +1,11 @@
 export declare class User {
     id: number;
     email: string;
-    password: string;
-    hashPasswordBeforeInsert(): void;
-    first_name: string;
-    last_name: string;
-    dob: Date;
-    isActive: boolean;
-    otp: number;
-    otpTimestamp: Date;
+    name: string;
+    phone_no: number;
+    occupation: string;
+    address: string;
     createdAt: Date;
+    updatedAt: Date;
+    updateUpdatedAtBeforeInsert(): void;
 }

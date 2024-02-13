@@ -2,7 +2,7 @@ import { Body, Controller, Post, Res } from "@nestjs/common";
 import { AuthUserDto } from "../dtos/auth.dto";
 import { AuthService } from "../services/auth.service";
 import { Response } from "express";
-import { sendResponse } from "src/utils/sendResponse";
+import { CustomApiResponse } from "src/utils/sendResponse";
 
 
 @Controller('auth') 
@@ -11,20 +11,42 @@ export class AuthController {
 
     @Post()
     async authUser(@Body() authUserDto: AuthUserDto, @Res() res: Response) {
-        const token = await this.authService.authUser(authUserDto);
-        sendResponse(res, { message: 'Token sent.', token }, 200);
+        try {
+            const token = await this.authService.authUser(authUserDto);
+            const responseToSend = new CustomApiResponse(200, { message: 'Token generated and sent.', token });
+            responseToSend.sendResponse(res);
+
+        } catch (error) {
+            throw new Error(error);
+        }
+
     }
 
     @Post('forgot-password')
     async forgotPassword(@Body() body: { email: string },  @Res() res: Response) {
-        const otp = await this.authService.forgotPassword(body.email);
-        sendResponse(res, { message: 'OTP sent.', otp }, 200);
+        try {
+            
+            const savedUserInOtpRepository = await this.authService.forgotPassword(body.email);
+            const responseToSend = new CustomApiResponse(200, { message: 'Otp sent', data: savedUserInOtpRepository });
+            responseToSend.sendResponse(res);
+
+        } catch (error) {
+            throw new Error(error);
+        }
+
     }
 
     @Post('reset-password') 
     async resetPassword(@Body() body: { email: string, otp: number, newPassword: string },  @Res() res: Response) {
-        const data = await this.authService.resetPassword(body.email, body.otp, body.newPassword);
-        sendResponse(res, { message: 'Password succesfully reset.', data}, 200);
+        try {
+            
+            const data = await this.authService.resetPassword(body.email, body.otp, body.newPassword);
+            const responseToSend = new CustomApiResponse(200, { message: 'Password succesfully reset', data });
+            responseToSend.sendResponse(res);
+
+        } catch (error) {
+            throw new Error(error);
+        }
     }
     
 }

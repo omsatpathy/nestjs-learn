@@ -23,13 +23,25 @@ let UsersController = class UsersController {
         this.usersService = usersService;
     }
     ;
-    async createUser(createUserDto, response) {
-        const createdUser = await this.usersService.createUser(createUserDto, response);
-        (0, sendResponse_1.sendResponse)(response, { message: 'User created.', createdUser }, 200);
+    async createUser(createUserDto, res) {
+        try {
+            const createdUser = await this.usersService.createUser(createUserDto);
+            const responseToSend = new sendResponse_1.CustomApiResponse(200, { message: 'User succesfully created.', userData: createdUser });
+            responseToSend.sendResponse(res);
+        }
+        catch (error) {
+            throw new Error(error);
+        }
     }
-    async deleteUser(request, response) {
-        const deletedUser = await this.usersService.deleteUser(request, response);
-        (0, sendResponse_1.sendResponse)(response, { message: 'User deleted.', data: deletedUser }, 200);
+    async deleteUser(request, res) {
+        try {
+            const deletedUser = await this.usersService.deleteUser(request);
+            const responseToSend = new sendResponse_1.CustomApiResponse(200, { message: 'User deleted.', deletedUser });
+            responseToSend.sendResponse(res);
+        }
+        catch (error) {
+            throw new Error(error);
+        }
     }
 };
 exports.UsersController = UsersController;

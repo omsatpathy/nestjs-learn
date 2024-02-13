@@ -9,53 +9,61 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.UserPassword = void 0;
 const typeorm_1 = require("typeorm");
-let User = class User {
+const User_1 = require("./User");
+const md5 = require("md5");
+let UserPassword = class UserPassword {
+    hashPasswordBeforeInsert() {
+        this.password = md5(this.password);
+    }
     updateUpdatedAtBeforeInsert() {
         this.updatedAt = new Date(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`);
     }
 };
-exports.User = User;
+exports.UserPassword = UserPassword;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)(),
     __metadata("design:type", Number)
-], User.prototype, "id", void 0);
+], UserPassword.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ unique: true }),
-    __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "name", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", Number)
-], User.prototype, "phone_no", void 0);
+    (0, typeorm_1.OneToOne)(() => User_1.User),
+    (0, typeorm_1.JoinColumn)(),
+    __metadata("design:type", User_1.User)
+], UserPassword.prototype, "user_id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], User.prototype, "occupation", void 0);
+], UserPassword.prototype, "email", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], User.prototype, "address", void 0);
+], UserPassword.prototype, "password", void 0);
+__decorate([
+    (0, typeorm_1.BeforeInsert)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UserPassword.prototype, "hashPasswordBeforeInsert", null);
+__decorate([
+    (0, typeorm_1.Column)({ default: true, nullable: false, type: 'boolean' }),
+    __metadata("design:type", Boolean)
+], UserPassword.prototype, "isActive", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'date', default: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}` }),
     __metadata("design:type", Date)
-], User.prototype, "createdAt", void 0);
+], UserPassword.prototype, "createdAt", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'date', default: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}` }),
     __metadata("design:type", Date)
-], User.prototype, "updatedAt", void 0);
+], UserPassword.prototype, "updatedAt", void 0);
 __decorate([
     (0, typeorm_1.BeforeUpdate)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], User.prototype, "updateUpdatedAtBeforeInsert", null);
-exports.User = User = __decorate([
-    (0, typeorm_1.Entity)({ name: 'users' })
-], User);
-//# sourceMappingURL=User.js.map
+], UserPassword.prototype, "updateUpdatedAtBeforeInsert", null);
+exports.UserPassword = UserPassword = __decorate([
+    (0, typeorm_1.Entity)({ name: 'user_Passwords' })
+], UserPassword);
+//# sourceMappingURL=UserPassword.js.map

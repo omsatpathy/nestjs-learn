@@ -23,16 +23,34 @@ let AuthController = class AuthController {
     }
     ;
     async authUser(authUserDto, res) {
-        const token = await this.authService.authUser(authUserDto);
-        (0, sendResponse_1.sendResponse)(res, { message: 'Token sent.', token }, 200);
+        try {
+            const token = await this.authService.authUser(authUserDto);
+            const responseToSend = new sendResponse_1.CustomApiResponse(200, { message: 'Token generated and sent.', token });
+            responseToSend.sendResponse(res);
+        }
+        catch (error) {
+            throw new Error(error);
+        }
     }
     async forgotPassword(body, res) {
-        const otp = await this.authService.forgotPassword(body.email);
-        (0, sendResponse_1.sendResponse)(res, { message: 'OTP sent.', otp }, 200);
+        try {
+            const savedUserInOtpRepository = await this.authService.forgotPassword(body.email);
+            const responseToSend = new sendResponse_1.CustomApiResponse(200, { message: 'Otp sent', data: savedUserInOtpRepository });
+            responseToSend.sendResponse(res);
+        }
+        catch (error) {
+            throw new Error(error);
+        }
     }
     async resetPassword(body, res) {
-        const data = await this.authService.resetPassword(body.email, body.otp, body.newPassword);
-        (0, sendResponse_1.sendResponse)(res, { message: 'Password succesfully reset.', data }, 200);
+        try {
+            const data = await this.authService.resetPassword(body.email, body.otp, body.newPassword);
+            const responseToSend = new sendResponse_1.CustomApiResponse(200, { message: 'Password succesfully reset', data });
+            responseToSend.sendResponse(res);
+        }
+        catch (error) {
+            throw new Error(error);
+        }
     }
 };
 exports.AuthController = AuthController;
